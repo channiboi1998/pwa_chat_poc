@@ -23,9 +23,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   >([]);
   const [socket, setSocket] = useState<Socket>();
   useEffect(() => {
-    const socketio = io(
-      "https://nest-socket-production.up.railway.app/socket/socket"
-    ); // Replace with your server URL
+    const socketio = io("https://nest-socket-production.up.railway.app/socket"); // Replace with your server URL
     setSocket(socketio);
     socketio.emit("leaveAllRooms");
     setMessages([]);
