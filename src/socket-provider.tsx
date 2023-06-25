@@ -11,7 +11,8 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const { register, handleSubmit, setValue } = useForm();
   const [orderNo, setOrderNo] = useState("");
-  const [storeId, setStoreId] = useState("63632a3a45d09b39b8c7c083");
+  const [status, setStatus] = useState("");
+  const [storeId, setStoreId] = useState("63632a4845d09b39b8c7c0dc");
   const [messages, setMessages] = useState<
     {
       body: string;
@@ -35,6 +36,12 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
       });
       socketio.on("getOrderConversation", (payload) => {
         setMessages(payload);
+      });
+      socketio.on("updateOrderStatus", (payload) => {
+        console.log(payload);
+        if (payload.body.status) {
+          setStatus(payload.body.status);
+        }
       });
       socketio.on("newMessage", (payload) => {
         setMessages((prevMessages) => [...prevMessages, payload]);
@@ -73,32 +80,37 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
             onBlur={(e) => setOrderNo(e.currentTarget.value)}
           />
           <input
-            defaultValue="63632a3a45d09b39b8c7c083"
+            defaultValue="63632a4845d09b39b8c7c0dc"
             className="w-full border-2"
             placeholder="Enter store id here"
             onBlur={(e) => setStoreId(e.currentTarget.value)}
           />
         </div>
         {/* Chat Messages */}
-        <div className="bg-white w-[500px] h-[300px] overflow-y-auto">
-          {messages &&
-            messages.map((message: any, key: number) => (
-              <p key={key} className="p-1">
-                {message.sender.name}: {message.body}
-              </p>
-            ))}
-        </div>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-row w-[500px] bg-white"
-        >
-          <input
-            className="border flex-1"
-            {...register("message")}
-            placeholder="Insert message here"
-          />
-          <button className="p-2 bg-green-200">Send</button>
-        </form>
+        {orderNo && storeId && (
+          <>
+            Status: {status}
+            <div className="bg-white w-[500px] h-[300px] overflow-y-auto">
+              {messages &&
+                messages.map((message: any, key: number) => (
+                  <p key={key} className="p-1">
+                    {message.sender.name}: {message.body}
+                  </p>
+                ))}
+            </div>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="flex flex-row w-[500px] bg-white"
+            >
+              <input
+                className="border flex-1"
+                {...register("message")}
+                placeholder="Insert message here"
+              />
+              <button className="p-2 bg-green-200">Send</button>
+            </form>
+          </>
+        )}
       </div>
     </SocketContext.Provider>
   );
